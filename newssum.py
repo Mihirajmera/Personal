@@ -4,7 +4,7 @@ from gtts import gTTS
 from IPython.display import Audio, display
 
 print("Loading AI models... (This may take 30-60 seconds the first time)")
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+generation = pipeline("text-generation", model="facebook/bart-large-cnn")
 print("AI Assistant Ready!\n")
 
 
@@ -42,7 +42,7 @@ while True:
     print(" AI Virtual Assistant")
     print("==============================")
     print("1. Sentiment Analysis")
-    print("2. News/Text Summarizer")
+    print("2. News/Text generation")
     print("3. Exit")
 
     choice = input("\nChoose an option: ")
@@ -69,7 +69,7 @@ while True:
         speak(response)
 
     # -------------------------
-    # Summarizer
+    # generation
     # -------------------------
     elif choice == "2":
 
@@ -78,7 +78,7 @@ while True:
 
         print("\nGenerating summary...\n")
 
-        summary = summarizer(
+        summary = generation(
             article,
             max_length=60,
             min_length=20,
