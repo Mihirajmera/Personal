@@ -1,106 +1,213 @@
+# ==========================================
+# AI Virtual Assistant
+# Sentiment + Text Generation + Text Speech
+# Google Colab Version
+# ==========================================
+
 from transformers import pipeline
 from textblob import TextBlob
 from gtts import gTTS
 from IPython.display import Audio, display
+import os
 
-print("Loading AI models... (This may take 30-60 seconds the first time)")
-generation = pipeline("text-generation", model="facebook/bart-large-cnn")
+
+# ------------------------------------------
+# Load AI Model
+# ------------------------------------------
+
+print("Loading AI model... (First time may take 30-60 seconds)")
+
+generation = pipeline(
+    "text-generation",
+    model="gpt2"
+)
+
 print("AI Assistant Ready!\n")
 
 
-# -----------------------------
+# ------------------------------------------
 # Sentiment Analysis
-# -----------------------------
+# ------------------------------------------
+
 def sentiment_analysis(text):
+
     polarity = TextBlob(text).sentiment.polarity
 
     if polarity > 0.2:
         mood = "😊 Positive"
+
     elif polarity < -0.2:
         mood = "😔 Negative"
+
     else:
         mood = "😐 Neutral"
 
     return mood
 
 
-# -----------------------------
-# Text to Speech
-# -----------------------------
+
+# ------------------------------------------
+# Text To Speech
+# ------------------------------------------
+
 def speak(text):
-    tts = gTTS(text=text, lang="en")
-    tts.save("assistant.mp3")
-    display(Audio("assistant.mp3", autoplay=True))
+
+    tts = gTTS(
+        text=text,
+        lang="en"
+    )
+
+    file = "assistant_voice.mp3"
+
+    tts.save(file)
+
+    display(
+        Audio(
+            file,
+            autoplay=True
+        )
+    )
 
 
-# -----------------------------
-# Main Assistant
-# -----------------------------
+
+# ------------------------------------------
+# AI Text Generation
+# ------------------------------------------
+
+def generate_text(prompt):
+
+    response = generation(
+        prompt,
+        max_length=120,
+        do_sample=True,
+        temperature=0.7,
+        num_return_sequences=1
+    )
+
+    return response[0]["generated_text"]
+
+
+
+# ------------------------------------------
+# Main Assistant Loop
+# ------------------------------------------
+
 while True:
 
     print("\n==============================")
-    print(" AI Virtual Assistant")
+    print(" 🤖 AI Virtual Assistant")
     print("==============================")
+
     print("1. Sentiment Analysis")
-    print("2. News/Text generation")
+    print("2. AI Text Generation")
     print("3. Exit")
+
 
     choice = input("\nChoose an option: ")
 
-    # -------------------------
+
+
+    # --------------------------------------
     # Sentiment Analysis
-    # -------------------------
+    # --------------------------------------
+
     if choice == "1":
 
-        text = input("\nHow are you feeling today?\n\n> ")
+        text = input(
+            "\nHow are you feeling today?\n\n> "
+        )
 
         mood = sentiment_analysis(text)
 
-        print("\nDetected Sentiment:", mood)
-
-        if "Positive" in mood:
-            response = "That's wonderful! Keep smiling."
-        elif "Negative" in mood:
-            response = "I'm sorry you're feeling that way. Tomorrow is a new day."
-        else:
-            response = "Thank you for sharing your thoughts."
-
-        print("Assistant:", response)
-        speak(response)
-
-    # -------------------------
-    # generation
-    # -------------------------
-    elif choice == "2":
-
-        print("\nPaste a news article or any long paragraph.")
-        article = input("\nText:\n")
-
-        print("\nGenerating summary...\n")
-
-        summary = generation(
-            article,
-            max_length=60,
-            min_length=20,
-            do_sample=False
+        print(
+            "\nDetected Sentiment:",
+            mood
         )
 
-        result = summary[0]["summary_text"]
 
-        print("Summary:\n")
+        if "Positive" in mood:
+
+            response = (
+                "That's wonderful! "
+                "Keep maintaining a positive mindset."
+            )
+
+
+        elif "Negative" in mood:
+
+            response = (
+                "I'm sorry you are feeling this way. "
+                "Remember, difficult times pass."
+            )
+
+
+        else:
+
+            response = (
+                "Thank you for sharing your thoughts."
+            )
+
+
+        print(
+            "\nAssistant:",
+            response
+        )
+
+        speak(response)
+
+
+
+    # --------------------------------------
+    # Text Generation
+    # --------------------------------------
+
+    elif choice == "2":
+
+        prompt = input(
+            "\nWhat should I write about?\n\n> "
+        )
+
+
+        print(
+            "\nGenerating response..."
+        )
+
+
+        result = generate_text(prompt)
+
+
+        print(
+            "\nAI Generated Text:\n"
+        )
+
         print(result)
 
-        speak("Here is the summary.")
+
         speak(result)
 
-    # -------------------------
+
+
+    # --------------------------------------
     # Exit
-    # -------------------------
+    # --------------------------------------
+
     elif choice == "3":
 
-        speak("Goodbye. Have a great day.")
-        print("\nGoodbye!")
+        goodbye = (
+            "Goodbye! "
+            "Have a great day."
+        )
+
+        print(goodbye)
+
+        speak(goodbye)
+
         break
 
+
+
     else:
-        print("\nInvalid choice.")
+
+        print(
+            "\nInvalid option. Try again."
+        )
