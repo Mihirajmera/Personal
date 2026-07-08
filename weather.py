@@ -116,7 +116,8 @@ else:
     if rain >= 70:
         advice += "There is a high chance of rain, so take an umbrella."
 
-    e   advice += "There might be some rain later today."
+    elif rain >= 30:   
+      advice += "There might be some rain later today."
 
     else:
         advice += "Rain is unlikely today."
@@ -167,5 +168,5 @@ else:
     {advice}
     """
 
-    speak(message)lif rain >= 30:
+    speak(message)
      
